@@ -33,7 +33,7 @@ describe('WSManager', () => {
     }
   });
 
-  it('rejects connections without auth cookie', async () => {
+  it('accepts anonymous connections without auth cookie', async () => {
     const result = await createTestServer();
     server = result.server;
     wsManager = result.wsManager;
@@ -41,12 +41,13 @@ describe('WSManager', () => {
 
     const ws = new WebSocket(`ws://localhost:${port}`);
 
-    await new Promise<void>((resolve) => {
-      ws.on('error', () => resolve());
-      ws.on('close', () => resolve());
+    await new Promise<void>((resolve, reject) => {
+      ws.on('open', () => resolve());
+      ws.on('error', (err) => reject(err));
     });
 
-    expect(ws.readyState).not.toBe(WebSocket.OPEN);
+    expect(ws.readyState).toBe(WebSocket.OPEN);
+    ws.close();
   });
 
   it('accepts connections with valid auth cookie', async () => {
