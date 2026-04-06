@@ -1,125 +1,194 @@
 # Real-Time Trading Dashboard
 
-A real-time cryptocurrency and stock trading dashboard with live WebSocket price streaming, interactive charts, and price alerts.
+This repository contains a fullstack trading dashboard built for the real-time dashboard coding challenge.
 
-## Architecture
+It includes:
 
-- **Backend** (`apps/server`): Node.js + Express + ws — REST API and WebSocket server with mock price generation using geometric Brownian motion
-- **Frontend** (`apps/web`): React 18 + Vite + Tailwind CSS v4 — real-time UI with Recharts, TanStack Query, and Zustand
-- **Shared** (`packages/shared`): TypeScript types and constants shared across apps
+- a Node.js backend that simulates market data
+- a React + TypeScript frontend that renders live prices and charts
+- a shared package for types and constants
+- Docker support for running the app as separate services
+
+The app streams mock prices for a small watchlist of crypto and stock tickers and lets the user inspect recent price history for the selected instrument.
+
+## What Is Implemented
+
+### Backend
+
+- REST API to list available tickers
+- REST API to fetch mocked historical candle data
+- WebSocket endpoint for real-time price updates
+- in-memory cache for generated price history
+- mocked authentication endpoints using JWT cookies
+- unit tests for cache, price generation, and WebSocket manager logic
+
+### Frontend
+
+- watchlist with live price updates
+- real-time chart for the selected ticker
+- ticker switching
+- responsive layout for desktop and mobile
+- loading states for historical data
+- mocked sign-in flow
+- price alert UI for authenticated users
+
+## Tickers
+
+The demo currently includes 6 instruments:
+
+- BTC-USD
+- ETH-USD
+- SOL-USD
+- AAPL
+- TSLA
+- NVDA
+
+## Project Structure
+
+```text
+.
+├── apps/
+│   ├── server/     # Express + ws backend
+│   └── web/        # React + Vite frontend
+├── packages/
+│   └── shared/     # shared types and constants
+├── docker-compose.yml
+├── package.json
+└── turbo.json
+```
 
 ## Tech Stack
 
-| Layer | Technology | Why |
-|-------|-----------|-----|
-| Monorepo | Turborepo + pnpm | Parallel builds, shared packages |
-| Backend | Express + ws | Lightweight WebSocket (no socket.io overhead) |
-| Auth | JWT in HttpOnly cookies | XSS-proof token storage |
-| Frontend | Vite + React 18 | Fast HMR, modern bundling |
-| Styling | Tailwind CSS v4 | Utility-first, zero runtime |
-| Charts | Recharts | Composable React chart components |
-| State | Zustand | Minimal boilerplate global state |
-| Data fetching | TanStack Query v5 | Caching, stale-while-revalidate |
-| Font | Inter (self-hosted) | Clean UI typography |
+### Backend
 
-## Getting Started
+- Node.js
+- Express
+- ws
+- TypeScript
+- Vitest
+
+### Frontend
+
+- React
+- TypeScript
+- Vite
+- Recharts
+- Zustand
+- TanStack Query
+- Tailwind CSS
+
+### Workspace
+
+- pnpm
+- Turborepo
+- Docker
+
+## Local Development
 
 ### Prerequisites
+
 - Node.js 20+
 - pnpm 9+
-- Docker (optional)
 
-### Local Development
+### Install
 
 ```bash
 pnpm install
-pnpm dev          # starts both server (3001) and web (5173)
 ```
 
-### Docker
+### Run the app
+
+```bash
+pnpm dev
+```
+
+Services:
+
+- frontend: `http://localhost:5173`
+- backend: `http://localhost:3001`
+
+## Docker
+
+Run both services with Docker Compose:
 
 ```bash
 docker-compose up --build
-# Web: http://localhost:3000
-# API: http://localhost:3001
 ```
 
-### Demo Credentials
+Services:
 
-```
+- frontend: `http://localhost:3000`
+- backend: `http://localhost:3001`
+
+## Demo Credentials
+
+The dashboard is readable without signing in.
+
+To test the mocked auth flow and alerts:
+
+```text
 Email: trader@demo.com
 Password: password123
 ```
 
-## Features
+## API Overview
 
-- **Public dashboard** — live prices and charts accessible without sign-in
-- **Live price streaming** via WebSocket with sub-200ms update target
-- **Interactive price charts** with 1m/5m/1H/1D timeframe toggle
-- **6 tickers**: BTC, ETH, SOL (crypto) + AAPL, TSLA, NVDA (stocks)
-- **Price alerts** (authenticated) — toast notifications when targets are hit, login dialog prompts on create
-- **Skeleton loading states** — animated placeholders while data loads
-- **Responsive layout** — desktop sidebar + mobile hamburger menu
-- **Secure authentication** — HttpOnly cookie JWT, only required for alert management
+### REST
 
-## Performance Optimizations
+- `GET /api/health`
+- `GET /api/tickers`
+- `GET /api/tickers/:symbol/history?timeframe=1m|5m|1h|1d&limit=200`
+- `POST /api/auth/login`
+- `POST /api/auth/logout`
+- `GET /api/auth/me`
 
-- `useRef` for WebSocket price data — avoids re-render cascade
-- Throttled state flushes at 100ms intervals 
-- `React.memo` with custom comparators on TickerCard
-- `font-variant-numeric: tabular-nums` prevents price width jumping
-- Zustand selectors with shallow equality checks
+### WebSocket
 
-## Security
+- `GET /ws`
 
-- JWT stored in HttpOnly cookies (never accessible to JavaScript)
-- SameSite=Strict prevents CSRF attacks
-- Secure flag enforces HTTPS in production
-- WebSocket auth via cookie on upgrade (no token in URL)
-- CORS with explicit origin and credentials
+Client messages:
 
-## Design Decisions & Trade-offs
+- `subscribe`
+- `unsubscribe`
 
-- **ws over socket.io**: Lighter, no polling fallback needed for a modern app. Trade-off: no automatic reconnection or room abstraction built in — we implement reconnect with exponential backoff manually.
-- **WebSocket over REST polling for prices**: Sub-200ms latency vs ~1s polling. Trade-off: more complex connection management, but necessary for real-time feel.
-- **Vite over Next.js**: Client-side real-time app with no SEO needs, so SSR adds complexity without value.
-- **Zustand over Redux**: Minimal boilerplate for a small state surface (selected ticker + live prices). Trade-off: less structured than Redux for larger apps, but right-sized here.
-- **In-memory cache over Redis**: Single-service architecture, no external dependencies. Trade-off: data is lost on server restart and cannot scale horizontally which is acceptable for a demo.
-- **HttpOnly cookies over localStorage**: Prevents XSS token theft. Trade-off: requires CORS credentials config and cookie-parser middleware.
-- **localStorage for alerts**: Simple persistence without backend storage. Trade-off: alerts don't sync across devices or tabs.
-
+The frontend subscribes to ticker streams over WebSocket and updates the watchlist in near real time.
 
 ## Testing
 
+Run all tests:
+
 ```bash
-pnpm test          # runs all tests
-pnpm test:server   # backend only
+pnpm test
 ```
 
-## Project Structure
+Run backend tests only:
 
+```bash
+pnpm test:server
 ```
-trading-dashboard/
-├── turbo.json
-├── package.json
-├── pnpm-workspace.yaml
-├── docker-compose.yml
-├── packages/
-│   └── shared/          # Shared TypeScript types & constants
-├── apps/
-│   ├── server/          # Express + ws backend
-│   │   ├── src/
-│   │   │   ├── services/    # priceGenerator, cacheStore, wsManager
-│   │   │   ├── routes/      # auth, tickers REST endpoints
-│   │   │   ├── middleware/  # JWT auth via cookie
-│   │   │   └── __tests__/   # vitest unit tests
-│   │   └── Dockerfile
-│   └── web/             # React + Vite frontend
-│       ├── src/
-│       │   ├── components/  # UI components (layout, ticker, chart, alerts)
-│       │   ├── hooks/       # useWebSocket, useTickers, useAlerts
-│       │   ├── stores/      # Zustand stores (ticker, alert)
-│       │   ├── context/     # AuthContext
-│       │   └── api/         # REST API client
-│       └── Dockerfile
+
+Build the workspace:
+
+```bash
+pnpm build
 ```
+
+## Assumptions And Trade-offs
+
+- Market data is mocked. Prices are generated in-process and are not connected to a real exchange feed.
+- Historical data is generated in memory at startup and kept in memory afterward.
+- Authentication is intentionally simple and uses a mocked user record.
+- Alerts are stored in browser local storage, so they do not sync across browsers or devices.
+- The system is structured like a small monorepo with separate frontend and backend apps, but it is still a demo-sized implementation rather than a production trading system.
+
+## Bonus Features Implemented
+
+- mocked user authentication
+- in-memory caching for historical data
+- price threshold alerts
+
+## Notes
+
+- Historical candles support `1m`, `5m`, `1h`, and `1d` views.
+- The backend uses a simulated price model to keep the demo active without external dependencies.
+- The chart and watchlist are designed for quick interaction rather than strict market accuracy.
