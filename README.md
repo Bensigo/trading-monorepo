@@ -65,7 +65,7 @@ Password: password123
 ## Performance Optimizations
 
 - `useRef` for WebSocket price data — avoids re-render cascade
-- Throttled state flushes at 100ms intervals (max 10 renders/sec)
+- Throttled state flushes at 100ms intervals 
 - `React.memo` with custom comparators on TickerCard
 - `font-variant-numeric: tabular-nums` prevents price width jumping
 - Zustand selectors with shallow equality checks
@@ -84,18 +84,10 @@ Password: password123
 - **WebSocket over REST polling for prices**: Sub-200ms latency vs ~1s polling. Trade-off: more complex connection management, but necessary for real-time feel.
 - **Vite over Next.js**: Client-side real-time app with no SEO needs, so SSR adds complexity without value.
 - **Zustand over Redux**: Minimal boilerplate for a small state surface (selected ticker + live prices). Trade-off: less structured than Redux for larger apps, but right-sized here.
-- **In-memory cache over Redis**: Single-service architecture, no external dependencies. Trade-off: data is lost on server restart and cannot scale horizontally — acceptable for a demo.
+- **In-memory cache over Redis**: Single-service architecture, no external dependencies. Trade-off: data is lost on server restart and cannot scale horizontally which is acceptable for a demo.
 - **HttpOnly cookies over localStorage**: Prevents XSS token theft. Trade-off: requires CORS credentials config and cookie-parser middleware.
 - **localStorage for alerts**: Simple persistence without backend storage. Trade-off: alerts don't sync across devices or tabs.
 
-## Assumptions
-
-- **Mock price data**: Uses geometric Brownian motion with zero drift for realistic price simulation. Prices are not tied to real market data.
-- **Single-service deployment**: No horizontal scaling — one server instance holds all price state and WebSocket connections in memory.
-- **30-day history cap**: Cache stores max 43,200 one-minute candles per ticker (30 days). Older data is discarded to bound memory usage.
-- **JWT expiry**: Tokens expire after 24 hours with no refresh token rotation. In production, you'd add refresh tokens and shorter access token lifetimes.
-- **No persistent storage**: All price history is regenerated on server restart. In production, you'd persist to a time-series database.
-- **Public price data**: Ticker prices and charts are accessible without authentication. Only alert management requires sign-in.
 
 ## Testing
 
