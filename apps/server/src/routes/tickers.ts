@@ -1,13 +1,10 @@
 import { Router } from 'express';
 import { TICKERS } from '@repo/shared';
-import { authMiddleware } from '../middleware/auth';
 import type { CacheStore } from '../services/cacheStore';
 import type { PriceGenerator } from '../services/priceGenerator';
 
 export function tickersRouter(cacheStore: CacheStore, priceGenerator: PriceGenerator): Router {
   const router = Router();
-
-  router.use(authMiddleware);
 
   router.get('/', (_req, res) => {
     const prices = priceGenerator.getCurrentPrices();

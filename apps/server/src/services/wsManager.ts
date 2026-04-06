@@ -24,29 +24,23 @@ export class WSManager {
   private wss: WebSocketServer;
   private subscriptions = new Map<WebSocket, Set<string>>();
 
-  constructor(server: Server, jwtSecret: string) {
+  constructor(server: Server, _jwtSecret: string) {
     this.wss = new WebSocketServer({ noServer: true });
 
     server.on('upgrade', (request, socket, head) => {
-      const cookies = parseCookies(request.headers.cookie || '');
-      const token = cookies.token;
-
-      if (!token) {
-        socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
-        socket.destroy();
-        return;
-      }
-
-      try {
-        const user = jwt.verify(token, jwtSecret);
-        this.wss.handleUpgrade(request, socket, head, (ws) => {
-          (ws as any).user = user;
-          this.wss.emit('connection', ws, request);
-        });
-      } catch {
-        socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
-        socket.destroy();
-      }
+      this.wss.handleUpgrade(request, socket, head, (ws) => {
+        // Optionally attach user if authenticated
+        const cookies = parseCookies(request.headers.cookie || '');
+        const token = cookies.token;
+        if (token) {
+          try {
+            (ws as any).user = jwt.verify(token, _jwtSecret);
+          } catch {
+            // Anonymous connection — no user attached
+          }
+        }
+        this.wss.emit('connection', ws, request);
+      });
     });
 
     this.wss.on('connection', (ws: WebSocket) => {
