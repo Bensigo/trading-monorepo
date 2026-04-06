@@ -1,0 +1,16 @@
+{
+  "name": "trading-dashboard",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "test": "turbo test",
+    "test:server": "turbo test --filter=@repo/server",
+    "lint": "turbo lint"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.0",
+    "typescript": "^5.7.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}
