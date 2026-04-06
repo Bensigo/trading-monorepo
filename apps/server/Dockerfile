@@ -17,9 +17,10 @@ RUN pnpm --filter @repo/server build
 
 FROM node:20-alpine AS runner
 WORKDIR /app
-COPY --from=build /app/apps/server/dist ./dist
+COPY --from=build /app/apps/server/dist ./apps/server/dist
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/apps/server/node_modules ./apps/server/node_modules
-COPY --from=build /app/packages/shared/dist ./packages/shared/dist
+COPY --from=build /app/packages/shared ./packages/shared
 EXPOSE 3001
+WORKDIR /app/apps/server
 CMD ["node", "dist/index.js"]
