@@ -57,9 +57,6 @@ export function useWebSocket(enabled: boolean) {
         if (throttleTimer) clearInterval(throttleTimer);
         wsRef.current = null;
 
-        // Don't reconnect if 401 (auth failure)
-        if (event.code === 1008 || event.reason === 'Unauthorized') return;
-
         reconnectTimeoutRef.current = setTimeout(() => {
           reconnectDelay.current = Math.min(reconnectDelay.current * 2, 16000);
           connect();

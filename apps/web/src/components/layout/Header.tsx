@@ -6,7 +6,7 @@ interface HeaderProps {
 }
 
 export function Header({ onMenuToggle }: HeaderProps) {
-  const { user, logout } = useAuth();
+  const { user, logout, openLoginDialog } = useAuth();
 
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-surface px-4">
@@ -27,10 +27,18 @@ export function Header({ onMenuToggle }: HeaderProps) {
         </div>
       </div>
       <div className="flex items-center gap-3">
-        <span className="text-sm text-slate-500 hidden sm:block">{user?.name}</span>
-        <Button variant="ghost" size="sm" onClick={logout}>
-          Sign out
-        </Button>
+        {user ? (
+          <>
+            <span className="text-sm text-slate-500 hidden sm:block">{user.name}</span>
+            <Button variant="ghost" size="sm" onClick={logout}>
+              Sign out
+            </Button>
+          </>
+        ) : (
+          <Button variant="default" size="sm" onClick={openLoginDialog}>
+            Sign in
+          </Button>
+        )}
       </div>
     </header>
   );

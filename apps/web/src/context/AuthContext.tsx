@@ -5,6 +5,9 @@ import * as authApi from '@/api/auth';
 interface AuthContextValue {
   user: User | null;
   loading: boolean;
+  showLoginDialog: boolean;
+  openLoginDialog: () => void;
+  closeLoginDialog: () => void;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -14,6 +17,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
 
   useEffect(() => {
     authApi
@@ -26,6 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (email: string, password: string) => {
     const res = await authApi.login(email, password);
     setUser(res.user);
+    setShowLoginDialog(false);
   }, []);
 
   const logout = useCallback(async () => {
@@ -33,8 +38,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
+  const openLoginDialog = useCallback(() => setShowLoginDialog(true), []);
+  const closeLoginDialog = useCallback(() => setShowLoginDialog(false), []);
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, showLoginDialog, openLoginDialog, closeLoginDialog, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

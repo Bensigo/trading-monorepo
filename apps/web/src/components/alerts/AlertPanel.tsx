@@ -3,6 +3,7 @@ import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAlertStore } from '@/stores/alertStore';
+import { useAuth } from '@/context/AuthContext';
 import { AlertForm } from './AlertForm';
 import { formatPrice } from '@/lib/utils';
 
@@ -10,13 +11,22 @@ export function AlertPanel() {
   const [formOpen, setFormOpen] = useState(false);
   const alerts = useAlertStore((s) => s.alerts);
   const removeAlert = useAlertStore((s) => s.removeAlert);
+  const { user, openLoginDialog } = useAuth();
+
+  const handleNewAlert = () => {
+    if (!user) {
+      openLoginDialog();
+      return;
+    }
+    setFormOpen(true);
+  };
 
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <h3 className="text-base font-semibold">Price Alerts</h3>
-          <Button size="sm" onClick={() => setFormOpen(true)}>
+          <Button size="sm" onClick={handleNewAlert}>
             + New Alert
           </Button>
         </div>
