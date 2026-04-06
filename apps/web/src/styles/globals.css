@@ -1,0 +1,62 @@
+@import "tailwindcss";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+
+@theme {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  --color-up: #22C55E;
+  --color-up-muted: #22C55E1A;
+  --color-up-text: #16A34A;
+  --color-down: #EF4444;
+  --color-down-muted: #EF44441A;
+  --color-down-text: #DC2626;
+
+  --color-surface: #FFFFFF;
+  --color-surface-secondary: #F8FAFC;
+  --color-surface-tertiary: #F1F5F9;
+  --color-border: #E2E8F0;
+  --color-border-hover: #CBD5E1;
+
+  --animate-price-flash-up: flash-up 600ms ease-out;
+  --animate-price-flash-down: flash-down 600ms ease-out;
+  --animate-fade-in: fade-in 200ms ease-out;
+  --animate-slide-up: slide-up 300ms ease-out;
+}
+
+@keyframes flash-up {
+  0% { background-color: var(--color-up-muted); }
+  100% { background-color: transparent; }
+}
+
+@keyframes flash-down {
+  0% { background-color: var(--color-down-muted); }
+  100% { background-color: transparent; }
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes slide-up {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    @apply bg-surface-secondary text-slate-900;
+  }
+
+  .font-price {
+    font-feature-settings: 'tnum' 1, 'lnum' 1;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+}
