@@ -6,9 +6,11 @@ import { AlertPanel } from '@/components/alerts/AlertPanel';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { useAlertChecker } from '@/hooks/useAlerts';
 import { useToast } from '@/components/ui/toast';
+import { useAuth } from '@/context/AuthContext';
 
 export function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user } = useAuth();
   useWebSocket(true);
 
   const { toast } = useToast();
@@ -28,7 +30,7 @@ export function AppShell() {
         <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <main className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-4 lg:space-y-6">
           <PriceChart />
-          <AlertPanel />
+          {user && <AlertPanel />}
         </main>
       </div>
     </div>
