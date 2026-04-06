@@ -3,6 +3,7 @@ import type { PriceUpdate } from '@repo/shared';
 import { PriceDisplay } from '@/components/ticker/PriceDisplay';
 import { TimeframeToggle } from './TimeframeToggle';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { formatChange } from '@/lib/utils';
 
 interface ChartHeaderProps {
@@ -24,14 +25,23 @@ export function ChartHeader({ symbol, price, timeframe, onTimeframeChange }: Cha
           <Badge variant={change >= 0 ? 'up' : 'down'}>{ticker?.category}</Badge>
         </div>
         <div className="flex items-baseline gap-2 mt-0.5">
-          {price && <PriceDisplay price={price.price} size="lg" />}
-          <span
-            className={`font-price text-sm font-medium ${
-              change >= 0 ? 'text-up-text' : 'text-down-text'
-            }`}
-          >
-            {price ? formatChange(change) : '—'}
-          </span>
+          {price ? (
+            <>
+              <PriceDisplay price={price.price} size="lg" />
+              <span
+                className={`font-price text-sm font-medium ${
+                  change >= 0 ? 'text-up-text' : 'text-down-text'
+                }`}
+              >
+                {formatChange(change)}
+              </span>
+            </>
+          ) : (
+            <>
+              <Skeleton className="h-9 w-48" />
+              <Skeleton className="h-5 w-16" />
+            </>
+          )}
         </div>
       </div>
       <TimeframeToggle value={timeframe} onChange={onTimeframeChange} />

@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import { Card, CardContent } from '@/components/ui/card';
 import { ChartHeader } from './ChartHeader';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useTickerStore } from '@/stores/tickerStore';
 import { useHistoricalData } from '@/hooks/useHistoricalData';
 import { formatPrice } from '@/lib/utils';
@@ -63,8 +64,12 @@ export function PriceChart() {
         />
         <div className="mt-4 h-[280px] lg:h-[400px]">
           {isLoading ? (
-            <div className="flex h-full items-center justify-center text-sm text-slate-400">
-              Loading chart data...
+            <div className="flex h-full flex-col justify-between py-4">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-full" />
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
